@@ -26,8 +26,7 @@ app.get('/:id', (req, res) => {
 });
 
 app.post('/shorten', (req, res) => {
-    const { url } = req.body;
-    console.log(req.body);
+    const { url } = req.query;
     if (!url) return res.status(400).json({ msg: 'Please provide a URL' });
 
     try {
