@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const urls = require('./Urls');
 
 const app = express();
 
@@ -10,24 +9,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-// app.get('/hi', (req, res) => res.sendFile(path.join(__dirname, 'public', 'hello.html')));
-
-// Express will serve the devault html pages when navigated to them.
+// Express will fall back to the public folder.
 app.use(express.static("public"));
-
-app.get('/api/shortUrls', (req, res) => res.json(urls));
-
-app.get('/:id', (req, res) => {
-    const { id } = req.params;
-
-    if (!!id && id === 'easteregg') return res.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-
-    const shortenedUrl = urls.find(url => url.id === id);
-    
-    if (!!shortenedUrl) return res.redirect(shortenedUrl.url);
-    return res.sendFile(path.join(__dirname, 'public', '404.html'));
-});
 
 app.post('/api', (req, res) => {
     const { playerId } = req.query;
@@ -57,8 +40,6 @@ app.post('/api', (req, res) => {
 
     return res.json({ playerId: `${playerId}`, sensorId: `${sensorId}`})
 });
-
-// app.listen(PORT, () => console.log(`Server started on port:${PORT}`));
 
 const server = app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
 
