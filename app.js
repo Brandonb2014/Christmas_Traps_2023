@@ -1,5 +1,8 @@
-const express = require('express');
-const path = require('path');
+//const express = require('express');
+//const db = require('./database.js');
+import express from 'express';
+import { getPlayers } from './database.js';
+//const path = require('path');
 
 const app = express();
 
@@ -12,11 +15,18 @@ app.use(express.urlencoded({ extended: false }));
 // Express will fall back to the public folder.
 app.use(express.static("public"));
 
+app.get("/players", async (req, res) => {
+    const players = await getPlayers();
+    res.send(players);
+});
+
 app.post('/api', (req, res) => {
     const { playerId } = req.query;
     const { sensorId } = req.query;
 
     if (!playerId || !sensorId) return res.status(400).json({ msg: 'Missing playerId or sensorId' });
+
+
 
     switch (playerId) {
         case '87':
