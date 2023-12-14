@@ -35,11 +35,12 @@
                 text-shadow: #74d680 3px 4px;
             }
 
-            div#startButtonWrapper {
+            div#start-button-wrapper {
                 text-align: center;
+                margin: 0 0 40px 0;
             }
 
-            a#startButton {
+            a#start-button {
                 padding: 10px 15px;
                 background-color: #378B29;
                 border-radius: 10px;
@@ -48,11 +49,19 @@
                 font-size: 28pt;
             }
 
-            a#startButton:hover {
+            a#start-button:hover {
                 background-color: #FF0000;
                 transition: background-color 0.5s ease;
             }
-            #volumeText {
+
+            #volume-text-wrapper {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                margin: 50px;
+            }
+
+            #volume-text {
                 text-align: center;
                 font-size: 34pt;
                 color: #FF0000;
@@ -61,6 +70,7 @@
                 animation-iteration-count: infinite;
                 text-shadow: #FFF 1px 1px;
                 font-weight: bold;
+                margin: 0;
             }
 
             @keyframes example {
@@ -74,11 +84,12 @@
         <section class="sky">
             <section class="wrapper">
                 <h1>Traps 2023!</h1>
-                <div>
-                    <p id="volumeText">Volume on</p>
+                <div id="volume-text-wrapper">
+                    <p id="volume-text">Volume on</p>
+                    <p>(And don't use Chrome)</p>
                 </div>
-                <div id="startButtonWrapper">
-                    <a id="startButton" href="/intro.html">Tap here to begin</a>
+                <div id="start-button-wrapper">
+                    <a id="start-button" href="/intro.html">Tap here to begin</a>
                 </div>
             </section>
         </section>
