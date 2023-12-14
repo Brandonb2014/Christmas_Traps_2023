@@ -6,12 +6,12 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <style>
             body {
-                background-image: url("background.jpeg");
+                background-image: url("images/north-pole-background.jpeg");
                 background-color: #323965;
                 background-repeat: no-repeat;
                 background-attachment: fixed;
-                background-position: center;
-                font-family: bradley hand, cursive;
+                background-position: top;
+                font-family: bradley hand;
             }
 
             .wrapper {
@@ -20,6 +20,12 @@
                 padding: 1em;
                 max-width: 800px;
                 border-radius: 10px;
+            }
+            
+            .sky {
+                height: 90vh;
+                color: #FFF;
+                display: block;
             }
 
             h1 {
@@ -39,21 +45,47 @@
                 border-radius: 10px;
                 text-decoration: none;
                 color: #FFF;
+                font-size: 28pt;
             }
 
             a#startButton:hover {
                 background-color: #FF0000;
                 transition: background-color 0.5s ease;
             }
+            #volumeText {
+                text-align: center;
+                font-size: 34pt;
+                color: #FF0000;
+                animation-name: example;
+                animation-duration: 2s;
+                animation-iteration-count: infinite;
+                text-shadow: #FFF 1px 1px;
+                font-weight: bold;
+            }
+
+            @keyframes example {
+                from {color: #FF0000;}
+                to {color: #378B29;}
+            }
         </style>
         <title>Traps 2023</title>
     </head>
     <body>
-        <section class="wrapper">
-            <h1>Traps 2023!</h1>
-            <div id="startButtonWrapper">
-                <a id="startButton" href="/start.html">Click here to begin</a>
-            </div>
+        <section class="sky">
+            <section class="wrapper">
+                <h1>Traps 2023!</h1>
+                <div>
+                    <p id="volumeText">Volume on</p>
+                </div>
+                <div id="startButtonWrapper">
+                    <a id="startButton" href="/intro.html">Tap here to begin</a>
+                </div>
+            </section>
         </section>
+        <audio autoplay>
+            <source src="audio/WeWishYouAMerryChristmas.ogg" type="audio/ogg">
+            Your browser does not support the audio element.
+        </audio>
+        <script src="scripts/snow.js"></script>
     </body>
 </html>
