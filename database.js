@@ -8,11 +8,18 @@ const pool = mysql.createPool({
 }).promise();
 
 export async function getPlayers() {
-    const [rows] = await pool.query("SELECT * FROM players");
+    const [rows] = await pool.query(`
+        SELECT *
+        FROM players
+    `);
     return rows;
 }
 
 export async function getPlayer(id) {
-    const [rows] = await pool.query("SELECT * FROM players WHERE");
-    return rows;
+    const [row] = await pool.query(`
+        SELECT *
+        FROM players
+        WHERE id = ?
+    `, [id]);
+    return row[0];
 }

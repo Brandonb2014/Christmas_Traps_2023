@@ -1,5 +1,5 @@
 import express from 'express';
-import { getPlayers } from './database.js';
+import { getPlayers, getPlayer } from './database.js';
 
 const app = express();
 app.set("view engine", "ejs");
@@ -12,6 +12,16 @@ app.use(express.urlencoded({ extended: false }));
 
 // Express will fall back to the public folder.
 app.use(express.static("public"));
+
+app.get("/player/:id", async (req, res) => {
+    const { id } = req.params;
+    console.log('id:', id);
+    if (!id) return res.status(400).json({ msg: 'Player Id is required' });
+
+    const player = await getPlayer(id);
+    console.log('player:', player);
+    return res.json({ playerId: `${player.id}`, name: `${player.name}`, mission_id: `${player.mission_id}`});
+});
 
 app.get("/players", async (req, res) => {
     const players = await getPlayers();
@@ -46,7 +56,7 @@ app.post('/api', (req, res) => {
             break;
     }
 
-    return res.json({ playerId: `${playerId}`, sensorId: `${sensorId}`})
+    return res.json({ playerId: `${playerId}`, sensorId: `${sensorId}`});
 });
 
 const server = app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
