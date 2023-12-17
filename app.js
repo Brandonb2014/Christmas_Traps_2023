@@ -10,6 +10,13 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.get("/", async (req, res) => {
+    const players = await getPlayers();
+    res.render("index.ejs", {
+        players,
+    });
+});
+
 // Express will fall back to the public folder.
 app.use(express.static("public"));
 

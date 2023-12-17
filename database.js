@@ -11,6 +11,7 @@ export async function getPlayers() {
     const [rows] = await pool.query(`
         SELECT *
         FROM players
+        ORDER BY sort_order
     `);
     return rows;
 }
