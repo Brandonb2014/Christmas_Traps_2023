@@ -104,7 +104,7 @@
                 <p id="volume-text">Turn up your volume</p>
                 <p>(And don't use Chrome)</p>
 
-                <label for="players">Select player:</label>
+                <label for="players">Select Player:</label>
                 <select name="players" id="players" onchange="playerChanged()">
                     <option value="select">Select</option>
                     <% players.forEach(player => { %>
@@ -139,7 +139,7 @@
                 const difficultyLevel = document.getElementById("difficulty").value;
                 const selectedPlayer = document.getElementById("players").value;
 
-                const url = "intro.html?id=" + selectedPlayer + "&difficulty=" + difficultyLevel;
+                const url = "setPlayerDifficultyLevel?id=" + selectedPlayer + "&difficulty=" + difficultyLevel;
                 window.location.href=url;
             }
         </script>
