@@ -113,11 +113,12 @@
                 </select>
                 
                 <label for="difficulty">Select difficulty:</label>
-                <select name="difficulty" id="difficulty">
+                <select name="difficulty" id="difficulty" onchange="difficultyChanged()">
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
                 </select>
+                <p id="easy-mode-description">Easy mode has 3 missions.<br />The items are the pictures above the sensors themselves.</p>
+                <p id="medium-mode-description" style="display: none;">Medium mode has 6 missions with a different number of items to find in each mission.<br />The items are randomized and don't match the pictures above the sensors.</p>
                 
                 <button type="button" id="start-button" onclick="goToNextPage()" disabled>Start</button>
             </section>
@@ -133,6 +134,20 @@
                 const startButton = document.getElementById("start-button");
 
                 startButton.disabled = selectedPlayer != "select" ? false : true;
+            };
+
+            function difficultyChanged() {
+                const selectedDifficulty = document.getElementById("difficulty").value;
+                const easyModeDescription = document.getElementById("easy-mode-description");
+                const mediumModeDescription = document.getElementById("medium-mode-description");
+
+                if (selectedDifficulty == "easy") {
+                    easyModeDescription.style.display = "block";
+                    mediumModeDescription.style.display = "none";
+                } else if (selectedDifficulty == "medium") {
+                    easyModeDescription.style.display = "none";
+                    mediumModeDescription.style.display = "block";
+                }
             };
 
             function goToNextPage() {
