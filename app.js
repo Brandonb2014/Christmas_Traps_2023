@@ -1,6 +1,6 @@
 // npm run dev to run with nodemon
 import express from 'express';
-import { getPlayers, getPlayerByName, setPlayerDifficultyLevel, clearPlayerDifficultyLevels, clearPlayerDifficultyLevel, getPlayerMissions, saveNewScan, insertPlayerProgress, getPlayerMissionDetails, setPlayerMissionId, getPlayerScans, clearPlayerScans, checkPlayerProgress, updatePlayerProgress, clearPlayerData } from './database.js';
+import { getPlayers, getPlayerByName, setPlayerDifficultyLevel, clearPlayerDifficultyLevels, clearPlayerDifficultyLevel, getPlayerMissions, saveNewScan, insertPlayerProgress, getPlayerMissionDetails, setPlayerMissionId, getPlayerScans, clearPlayerScans, checkPlayerProgress, updatePlayerProgress, clearPlayerData, insertPlayerMissions, updatePlayerMission } from './database.js';
 
 const app = express();
 app.set("view engine", "ejs");
@@ -39,7 +39,11 @@ app.get("/setPlayerDifficultyLevel", async (req, res) => {
 
     if (!id || !difficulty) return res.status(400).json({ msg: 'Missing playerId or difficulty' });
 
+    // Delete any data in both player_missions and player_mission_details tables
+    // for the selected player before we add more data.
     const clearPlayerDataResponse = await clearPlayerData(id);
+
+    const insertPlayerMissionsResult = await insertPlayerMissions(id, difficulty);
 
     const insertPlayerProgressResult = await insertPlayerProgress(id, difficulty);
 
@@ -67,7 +71,8 @@ app.get("/dashboard", async (req, res) => {
     // Reset the mission_id of the player back to 0.
     const setPlayerMissionIdResponse = await setPlayerMissionId(id, 0);
 
-    const missions = await getPlayerMissions(difficulty);
+    const missions = await getPlayerMissions(id);
+
     res.render("dashboard.ejs", {
         id, difficulty, missions,
     });
@@ -79,7 +84,7 @@ app.get("/mission", async (req, res) => {
     const setPlayerMissionIdResponse = await setPlayerMissionId(id, missionId);
 
     const missionDetails = await getPlayerMissionDetails(id, missionId);
-    // console.log('missionDetails:', missionDetails);
+
     res.render("mission.ejs", {
         id, missionId, missionDetails, difficulty,
     });
@@ -89,11 +94,10 @@ app.get("/checkNewScans", async (req, res) => {
     const { id, missionId } = req.query;
 
     const getPlayerScansResponse = await getPlayerScans(id);
-    // console.log('getPlayerScansResponse:', getPlayerScansResponse);
 
     if (!!getPlayerScansResponse && !!getPlayerScansResponse[0]?.sensor_id) {
         const {sensor_id} = getPlayerScansResponse[0];
-    // console.log('getPlayerScansResponse:', getPlayerScansResponse);
+
         if (!!getPlayerScansResponse && !!sensor_id && !!missionId) {
             const clearPlayerScansResponse = await clearPlayerScans(id);
 
@@ -102,6 +106,7 @@ app.get("/checkNewScans", async (req, res) => {
             if (!!checkPlayerProgressResponse) {
                 // if data comes back, then we know that the player hit a sensor that is in their mission and we need to update the progress
                 const updatePlayerProgressResponse = await updatePlayerProgress(id, sensor_id, missionId);
+
                 return res.send(checkPlayerProgressResponse);
             }
             return res.status(200).json({ msg: 'No player progress response' });
@@ -111,10 +116,30 @@ app.get("/checkNewScans", async (req, res) => {
     return res.status(200).json({ msg: 'No player scans' }); 
 });
 
+app.get("/checkMissionProgress", async (req, res) => {
+    const { id, missionId } = req.query;
+
+    if (!id || !missionId) return res.status(400).json({ msg: 'Missing playerId or missionId' });
+
+    const missionDetails = await getPlayerMissionDetails(id, missionId);
+    let missionComplete = true;
+    for (let i = 0; i < missionDetails.length; i++) {
+        if (!missionDetails[i].is_collected) {
+            missionComplete = false;
+        }
+    }
+
+    if (missionComplete) {
+        const updatePlayerMissionResponse = await updatePlayerMission(id, missionId);
+    }
+    
+    return res.status(200).json({ msg: 'Mission updated' }); 
+});
+
 app.post('/api', async (req, res) => {
     const { playerId } = req.query;
     const { sensorId } = req.query;
-// console.log('api was just hit');
+
     if (!playerId || !sensorId) return res.status(400).json({ msg: 'Missing playerId or sensorId' });
 
     const result = await saveNewScan(playerId, sensorId);

@@ -52,6 +52,10 @@
                 font-size: 36pt;
                 font-weight: bold;
             }
+
+            #mission-wrapper a.complete {
+                background: #378B29;
+            }
             
             .sky {
                 height: 80vh;
@@ -67,7 +71,7 @@
                 <h1>Select a mission to start</h1>
                 <div id="mission-wrapper">
                     <% missions.forEach(mission => { %>
-                        <a href="mission?id=<%= id %>&missionId=<%= mission.id %>&difficulty=<%= difficulty %>"><%= mission.item %></a>
+                        <a class="<%= mission.is_complete == 1 ? 'complete' : '' %>" href="mission?id=<%= id %>&missionId=<%= mission.mission_id %>&difficulty=<%= difficulty %>"><%= mission.item %></a>
                     <% }) %>
                 </div>
             </div>

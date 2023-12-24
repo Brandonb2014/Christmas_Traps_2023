@@ -43,7 +43,17 @@ export async function getPlayerByName(name) {
     return row[0];
 }
 
-export async function getPlayerMissions(difficulty) {
+export async function getPlayerMissions(playerId) {
+    const [row] = await pool.query(`
+        SELECT *
+        FROM player_missions
+        WHERE player_id = ?
+        ORDER BY mission_id;
+    `, [playerId]);
+    return row;
+}
+
+export async function getMissions(difficulty) {
     const [row] = await pool.query(`
         SELECT *
         FROM missions
@@ -107,11 +117,16 @@ export async function clearPlayerScans(playerId) {
 }
 
 export async function clearPlayerData(playerId) {
-    const result = await pool.query(`
+    const deletePlayerMissionsResult = await pool.query(`
+        DELETE FROM player_missions
+        WHERE player_id = ?;
+    `, [playerId]);
+    
+    const deletePlayerMissionDetailsResult = await pool.query(`
         DELETE FROM player_mission_details
         WHERE player_id = ?;
     `, [playerId]);
-    return result;
+    return deletePlayerMissionDetailsResult;
 }
 
 export async function saveNewScan(playerId, sensorId) {
@@ -127,6 +142,7 @@ export async function saveNewScan(playerId, sensorId) {
         }
     } catch (error) {
         console.log('error saving new scan:', error);
+        return "";
     }
 }
 
@@ -142,14 +158,73 @@ export async function insertPlayerProgress(playerId, difficulty) {
     const missionDetails = await getMissionDetails(difficulty);
 
     if (difficulty == "easy") {
-        const sensor_ids = [2, 9, 7, 4, 1, 3, 6, 8, 5, 10];
+        //  1 snowman
+        //  2 candy cane
+        //  3 present
+        //  4 snowman
+        //  5 present
+        //  6 candy cane
+        //  7 present
+        //  8 snowman
+        //  9 candy cane
+        // 10 present
+        const sensor_ids = [1, 4, 8, 2, 6, 9, 3, 5, 10, 7];
+        for (let i = 0; i < missionDetails.length; i++) {
+            const [row] = await pool.query(`
+            INSERT INTO player_mission_details (player_id, sensor_id, mission_id, item, img_url, img_url_complete, audio_url, display, is_collected)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            `, [playerId, parseInt(sensor_ids[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, missionDetails[i].img_url, missionDetails[i].img_url_complete, missionDetails[i].audio_url, missionDetails[i].display, false]);
+        }
+    } else {
+        const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        const shuffle1 = await shuffle(arr);
+        const shuffle2 = await shuffle(arr);
+        const shuffle3 = await shuffle(arr);
+        const shuffle4 = await shuffle(arr);
+        const shuffle5 = await shuffle(arr);
+        const shuffle6 = await shuffle(arr);
+
+        const fullArray = shuffle1.concat(shuffle2, shuffle3, shuffle4, shuffle5, shuffle6);
+        
         for (let i = 0; i < missionDetails.length; i++) {
             const [row] = await pool.query(`
             INSERT INTO player_mission_details (player_id, sensor_id, mission_id, item, img_url, img_url_complete, display, is_collected)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-            `, [playerId, parseInt(sensor_ids[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, missionDetails[i].img_url, missionDetails[i].img_url_complete, missionDetails[i].display, false]);
+            `, [playerId, parseInt(fullArray[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, missionDetails[i].img_url, missionDetails[i].img_url_complete, missionDetails[i].display, false]);
         }
     }
+    return "Done";
+}
+
+export async function insertPlayerMissions(playerId, difficulty) {
+    const playerMissions = await getMissions(difficulty);
+
+    for (let i = 0; i < playerMissions.length; i++) {
+        const [row] = await pool.query(`
+        INSERT INTO player_missions (player_id, mission_id, item, img_url, img_url_complete, is_complete)
+        VALUES (?, ?, ?, ?, ?, ?);
+        `, [playerId, parseInt(playerMissions[i].id), playerMissions[i].item, playerMissions[i].img_url, playerMissions[i].img_url_complete, false]);
+    }
+
+    return "Done";
+}
+
+function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+  
+    // While there remain elements to shuffle.
+    while (currentIndex > 0) {
+  
+      // Pick a remaining element.
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+  
+    return array;
 }
 
 export async function updatePlayerProgress(playerId, sensorId, missionId) {
@@ -160,6 +235,16 @@ export async function updatePlayerProgress(playerId, sensorId, missionId) {
         AND sensor_id = ?
         AND mission_id = ?;
     `, [playerId, parseInt(sensorId), parseInt(missionId)]);
+    return row;
+}
+
+export async function updatePlayerMission(playerId, missionId) {
+    const [row] = await pool.query(`
+        UPDATE player_missions
+        SET is_complete = 1
+        WHERE player_id = ?
+        AND mission_id = ?;
+    `, [playerId, parseInt(missionId)]);
     return row;
 }
 
