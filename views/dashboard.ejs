@@ -68,10 +68,12 @@
     <body>
         <section class="sky">
             <div class="wrapper">
-                <h1>Select a mission to start</h1>
+                <h1>Tap on a mission to start</h1>
                 <div id="mission-wrapper">
                     <% missions.forEach(mission => { %>
-                        <a class="<%= mission.is_complete == 1 ? 'complete' : '' %>" href="mission?id=<%= id %>&missionId=<%= mission.mission_id %>&difficulty=<%= difficulty %>"><%= mission.item %></a>
+                        <a class="<%= mission.is_complete == 1 ? 'complete' : '' %>" href="mission?id=<%= id %>&missionId=<%= mission.mission_id %>&difficulty=<%= difficulty %>&mission=<%= mission.item %>">
+                            <img style="height: 100px;" src="<%= mission.img_url %>" alt="<%= mission.item %>" />
+                        </a>
                     <% }) %>
                 </div>
             </div>

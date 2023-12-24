@@ -21,6 +21,9 @@
             <source src="video/Traps2023Intro.mp4" type="video/mp4">
             This browser does not display the video tag.
         </video>
+        <a id="forward-button" href="/dashboard?id=<%= id %>&difficulty=<%= difficulty %>" style="position: absolute; right: 10em">
+            <img src="/images/rightArrow.png" />
+        </a>
     </body>
     <script>
         video = document.getElementById('welcome_vid');

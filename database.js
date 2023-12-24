@@ -188,9 +188,9 @@ export async function insertPlayerProgress(playerId, difficulty) {
         
         for (let i = 0; i < missionDetails.length; i++) {
             const [row] = await pool.query(`
-            INSERT INTO player_mission_details (player_id, sensor_id, mission_id, item, img_url, img_url_complete, display, is_collected)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-            `, [playerId, parseInt(fullArray[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, missionDetails[i].img_url, missionDetails[i].img_url_complete, missionDetails[i].display, false]);
+            INSERT INTO player_mission_details (player_id, sensor_id, mission_id, item, img_url, img_url_complete, audio_url, display, is_collected)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            `, [playerId, parseInt(fullArray[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, missionDetails[i].img_url, missionDetails[i].img_url_complete, missionDetails[i].audio_url, missionDetails[i].display, false]);
         }
     }
     return "Done";

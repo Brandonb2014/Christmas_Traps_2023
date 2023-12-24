@@ -79,14 +79,14 @@ app.get("/dashboard", async (req, res) => {
 });
 
 app.get("/mission", async (req, res) => {
-    const { id, missionId, difficulty } = req.query;
+    const { id, missionId, difficulty, mission } = req.query;
 
     const setPlayerMissionIdResponse = await setPlayerMissionId(id, missionId);
 
     const missionDetails = await getPlayerMissionDetails(id, missionId);
 
     res.render("mission.ejs", {
-        id, missionId, missionDetails, difficulty,
+        id, missionId, missionDetails, difficulty, mission,
     });
 });
 

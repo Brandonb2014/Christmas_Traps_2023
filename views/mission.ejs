@@ -83,8 +83,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         
         <script type="text/javascript" charset="utf-8">
+            let isAudioPlaying = false;
+
             async function runLoop() {
-                console.log('in runLoop():', new Date());
                 fetch("checkNewScans?id=<%= id %>&missionId=<%= missionId %>", {
                     headers: {
                         'Content-type': 'application/json'
@@ -92,7 +93,7 @@
                     method: 'GET'
                 })
                 .then(res => res.json())
-                .then((data) => {
+                .then(async (data) => {
                     if (!!data?.sensor_id) {
                         if (data.is_collected == 0) {
                             const missionTile = document.getElementById("sensorId" + data.sensor_id);
@@ -100,7 +101,7 @@
                             if (!!missionTile) {
                                 missionTile.style.backgroundColor = '#378B29';
                                 on(data.img_url);
-                                playAudio(data.audio_url);
+                                await playAudio(data.audio_url);
                             }
 
                             fetch("checkMissionProgress?id=<%= id %>&missionId=<%= missionId %>", {
@@ -109,6 +110,8 @@
                                 },
                                 method: 'GET'
                             })
+                        } else {
+                            await playAudio("audio/nothing-else-here.wav");
                         }
                     }
                 });
@@ -118,7 +121,7 @@
             function on(url) {
                 document.getElementById("overlay-image").src = url;
                 document.getElementById("overlay").style.bottom = "0";
-                setTimeout(off, 2500);
+                setTimeout(off, 4000);
             }
 
             function off() {
@@ -136,18 +139,21 @@
     <body onload="runLoop()">
         <section class="sky">
             <div class="wrapper">
-                <h1>Select a mission to start</h1>
+                <h1><%= mission %></h1>
                 <div id="mission-wrapper">
                     <% missionDetails.forEach(mission => { %>
                         <div
                             id="sensorId<%= mission.sensor_id %>"
                             class="mission-item <%= mission.is_collected == 1 ? 'complete' : '' %>"
-                            style="display: <%= mission.display == 1 ? 'block' : 'none' %>;">
-                            <%= mission.item %>
+                            style="display: <%= mission.display == 1 ? 'flex' : 'none' %>;"
+                        >
+                            <img style="height: 100px;" src="<%= mission.img_url %>" alt="<%= mission.item %>" />
                         </div>
                     <% }) %>
                 </div>
-                <a id="back-button" href="/dashboard?id=<%= id %>&difficulty=<%= difficulty %>"><img src="/images/leftArrow.png" /></a>
+                <a id="back-button" href="/dashboard?id=<%= id %>&difficulty=<%= difficulty %>">
+                    <img src="/images/leftArrow.png" />
+                </a>
             </div>
         </section>
         <div id="overlay" onclick="off()">
