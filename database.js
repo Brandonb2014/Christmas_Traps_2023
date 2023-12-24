@@ -171,9 +171,9 @@ export async function insertPlayerProgress(playerId, difficulty) {
         const sensor_ids = [1, 4, 8, 2, 6, 9, 3, 5, 10, 7];
         for (let i = 0; i < missionDetails.length; i++) {
             const [row] = await pool.query(`
-            INSERT INTO player_mission_details (player_id, sensor_id, mission_id, item, img_url, img_url_complete, audio_url, display, is_collected)
+            INSERT INTO player_mission_details (player_id, sensor_id, mission_id, item, item_id, img_url, audio_url, display, is_collected)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-            `, [playerId, parseInt(sensor_ids[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, missionDetails[i].img_url, missionDetails[i].img_url_complete, missionDetails[i].audio_url, missionDetails[i].display, false]);
+            `, [playerId, parseInt(sensor_ids[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, parseInt(missionDetails[i].id), missionDetails[i].img_url, missionDetails[i].audio_url, missionDetails[i].display, false]);
         }
     } else {
         const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -183,14 +183,15 @@ export async function insertPlayerProgress(playerId, difficulty) {
         const shuffle4 = await shuffle(arr);
         const shuffle5 = await shuffle(arr);
         const shuffle6 = await shuffle(arr);
+        const shuffle7 = await shuffle(arr);
 
-        const fullArray = shuffle1.concat(shuffle2, shuffle3, shuffle4, shuffle5, shuffle6);
+        const fullArray = shuffle1.concat(shuffle2, shuffle3, shuffle4, shuffle5, shuffle6, shuffle7);
         
         for (let i = 0; i < missionDetails.length; i++) {
             const [row] = await pool.query(`
-            INSERT INTO player_mission_details (player_id, sensor_id, mission_id, item, img_url, img_url_complete, audio_url, display, is_collected)
+            INSERT INTO player_mission_details (player_id, sensor_id, mission_id, item, item_id, img_url, audio_url, display, is_collected)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-            `, [playerId, parseInt(fullArray[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, missionDetails[i].img_url, missionDetails[i].img_url_complete, missionDetails[i].audio_url, missionDetails[i].display, false]);
+            `, [playerId, parseInt(fullArray[i]), parseInt(missionDetails[i].mission_id), missionDetails[i].item, parseInt(missionDetails[i].id), missionDetails[i].img_url, missionDetails[i].audio_url, missionDetails[i].display, false]);
         }
     }
     return "Done";
@@ -201,9 +202,9 @@ export async function insertPlayerMissions(playerId, difficulty) {
 
     for (let i = 0; i < playerMissions.length; i++) {
         const [row] = await pool.query(`
-        INSERT INTO player_missions (player_id, mission_id, item, img_url, img_url_complete, is_complete)
+        INSERT INTO player_missions (player_id, mission_id, item, img_url, audio_url, is_complete)
         VALUES (?, ?, ?, ?, ?, ?);
-        `, [playerId, parseInt(playerMissions[i].id), playerMissions[i].item, playerMissions[i].img_url, playerMissions[i].img_url_complete, false]);
+        `, [playerId, parseInt(playerMissions[i].id), playerMissions[i].item, playerMissions[i].img_url, playerMissions[i].audio_url, false]);
     }
 
     return "Done";
@@ -253,7 +254,8 @@ export async function getPlayerMissionDetails(playerId, missionId) {
         SELECT *
         FROM player_mission_details
         WHERE player_id = ?
-        AND mission_id = ?;
+        AND mission_id = ?
+        ORDER BY item_id;
     `, [playerId, parseInt(missionId)]);
     return row;
 }

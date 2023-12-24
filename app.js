@@ -79,14 +79,14 @@ app.get("/dashboard", async (req, res) => {
 });
 
 app.get("/mission", async (req, res) => {
-    const { id, missionId, difficulty, mission } = req.query;
+    const { id, missionId, difficulty, mission, audio_url } = req.query;
 
     const setPlayerMissionIdResponse = await setPlayerMissionId(id, missionId);
 
     const missionDetails = await getPlayerMissionDetails(id, missionId);
 
     res.render("mission.ejs", {
-        id, missionId, missionDetails, difficulty, mission,
+        id, missionId, missionDetails, difficulty, mission, audio_url,
     });
 });
 
@@ -143,9 +143,6 @@ app.post('/api', async (req, res) => {
     if (!playerId || !sensorId) return res.status(400).json({ msg: 'Missing playerId or sensorId' });
 
     const result = await saveNewScan(playerId, sensorId);
-    // res.send(result);
-
-
 
     switch (playerId) {
         case '87':

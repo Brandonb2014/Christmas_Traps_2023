@@ -39,11 +39,12 @@
 
             #mission-wrapper div {
                 display: flex;
+                flex-direction: column;
                 width: 5em;
-                height: 3em;
                 color: #FFF;
                 border: 1px solid black;
                 margin: 15px 5px;
+                padding: 10px 5px 0;
                 justify-content: center;
                 align-items: center;
                 border-radius: 10px;
@@ -83,8 +84,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         
         <script type="text/javascript" charset="utf-8">
-            let isAudioPlaying = false;
-
             async function runLoop() {
                 fetch("checkNewScans?id=<%= id %>&missionId=<%= missionId %>", {
                     headers: {
@@ -133,6 +132,11 @@
                 var audio = new Audio(audioUrl);
                 audio.play();
             }
+
+            function playNeedSpell() {
+                var audio = new Audio("http://192.168.0.146:3000/audio/need-spell.wav");
+                audio.play();
+            }
         </script>
         <title>Traps 2023</title>
     </head>
@@ -148,6 +152,7 @@
                             style="display: <%= mission.display == 1 ? 'flex' : 'none' %>;"
                         >
                             <img style="height: 100px;" src="<%= mission.img_url %>" alt="<%= mission.item %>" />
+                            <p style="font-size: 16pt;"><%= mission.item %></p>
                         </div>
                     <% }) %>
                 </div>
@@ -156,8 +161,11 @@
                 </a>
             </div>
         </section>
+        <audio autoplay onloadeddata="var audioPlayer = this;">
+            <source src="<%= audio_url %>" type="audio/mp3" />
+        </audio>
         <div id="overlay" onclick="off()">
-            <img id="overlay-image" src="" style="max-height: 500px; margin: 0 auto;" /> 
+            <img id="overlay-image" src="" style="max-height: 450px; max-width: 100%; margin: 0 auto;" /> 
         </div>
     </body>
 </html>

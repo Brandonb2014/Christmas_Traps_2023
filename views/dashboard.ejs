@@ -63,6 +63,13 @@
                 display: block;
             }
         </style>
+        <script>
+            function playHelp() {
+                const audioUrl = "http://192.168.0.146:3000/audio/help.wav";
+                var audio = new Audio(audioUrl);
+                audio.play();
+            }
+        </script>
         <title>Traps 2023</title>
     </head>
     <body>
@@ -71,16 +78,17 @@
                 <h1>Tap on a mission to start</h1>
                 <div id="mission-wrapper">
                     <% missions.forEach(mission => { %>
-                        <a class="<%= mission.is_complete == 1 ? 'complete' : '' %>" href="mission?id=<%= id %>&missionId=<%= mission.mission_id %>&difficulty=<%= difficulty %>&mission=<%= mission.item %>">
+                        <a class="<%= mission.is_complete == 1 ? 'complete' : '' %>" href="mission?id=<%= id %>&missionId=<%= mission.mission_id %>&difficulty=<%= difficulty %>&mission=<%= mission.item %>&audio_url=<%= mission.audio_url %>">
                             <img style="height: 100px;" src="<%= mission.img_url %>" alt="<%= mission.item %>" />
                         </a>
                     <% }) %>
                 </div>
+                <a id="back-button" href="/">
+                    <img style="height: 100px;" src="/images/home.png" />
+                </a>
+                <img style="height: 100px; padding-left: 2em; cursor: pointer;" onclick="playHelp()" src="/images/question.jpg" />
             </div>
         </section>
-        <!-- <audio autoplay onloadeddata="var audioPlayer = this; setTimeout(function() { audioPlayer.play(); }, 15000)">
-            <source src="audio/missionStart.mp3" type="audio/mp3" />
-        </audio> -->
         <script src="scripts/snow.js"></script>
     </body>
 </html>
