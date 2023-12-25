@@ -84,6 +84,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         
         <script type="text/javascript" charset="utf-8">
+            let isPlayingAudio = false;
             async function runLoop() {
                 fetch("checkNewScans?id=<%= id %>&missionId=<%= missionId %>", {
                     headers: {
@@ -110,9 +111,19 @@
                                 method: 'GET'
                             })
                         } else {
-                            await playAudio("audio/nothing-else-here.wav");
+                            if (!isPlayingAudio) {
+                                isPlayingAudio = true;
+                                await playAudio("audio/nothing-else-here.wav");
+                                isPlayingAudio = false;
+                            }
                         }
-                    }
+                    } else if (!!data?.msg && data.msg === "Need Spell") {
+                        if (!isPlayingAudio) {
+                            isPlayingAudio = true;
+                            await playAudio("audio/need-spell.wav");
+                            isPlayingAudio = false;
+                        }
+                    } 
                 });
                 setTimeout(runLoop, 1000);
             }
@@ -130,11 +141,6 @@
             function playAudio(audio) {
                 const audioUrl = "http://192.168.0.146:3000/" + audio;
                 var audio = new Audio(audioUrl);
-                audio.play();
-            }
-
-            function playNeedSpell() {
-                var audio = new Audio("http://192.168.0.146:3000/audio/need-spell.wav");
                 audio.play();
             }
         </script>

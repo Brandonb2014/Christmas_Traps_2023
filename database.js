@@ -91,6 +91,33 @@ export async function setPlayerMissionId(player_id, mission_id) {
     return row;
 }
 
+export async function updatePlayerMissionsComplete(player_id, status) {
+    const [row] = await pool.query(`
+        UPDATE players
+        SET missions_complete = ?
+        WHERE id = ?;
+    `, [status, player_id]);
+    return row;
+}
+
+export async function getPlayerMissionsComplete(player_id) {
+    const [row] = await pool.query(`
+        SELECT missions_complete
+        FROM players
+        WHERE id = ?;
+    `, [player_id]);
+    return row[0];
+}
+
+export async function updatePlayerUnlockedBasement(player_id, status) {
+    const [row] = await pool.query(`
+        UPDATE players
+        SET unlocked_basement = ?
+        WHERE id = ?;
+    `, [status, player_id]);
+    return row;
+}
+
 export async function clearPlayerDifficultyLevels() {
     const [row] = await pool.query(`
         UPDATE players
@@ -126,6 +153,7 @@ export async function clearPlayerData(playerId) {
         DELETE FROM player_mission_details
         WHERE player_id = ?;
     `, [playerId]);
+
     return deletePlayerMissionDetailsResult;
 }
 

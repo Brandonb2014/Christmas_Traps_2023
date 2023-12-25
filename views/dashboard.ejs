@@ -82,8 +82,11 @@
                             <img style="height: 100px;" src="<%= mission.img_url %>" alt="<%= mission.item %>" />
                         </a>
                     <% }) %>
+                    <a href="/basementMission?id=<%= id %>&missionId=11" style="display: <%= missionsComplete.missions_complete == 1 ? 'flex' : 'none' %>;">
+                        <img style="height: 100px;" src="/images/large-door.jpg" />
+                    </a>
                 </div>
-                <a id="back-button" href="/">
+                <a id="back-button" href="/?id=<%= id %>">
                     <img style="height: 100px;" src="/images/home.png" />
                 </a>
                 <img style="height: 100px; padding-left: 2em; cursor: pointer;" onclick="playHelp()" src="/images/question.jpg" />

@@ -1,6 +1,6 @@
 // npm run dev to run with nodemon
 import express from 'express';
-import { getPlayers, getPlayerByName, setPlayerDifficultyLevel, clearPlayerDifficultyLevels, clearPlayerDifficultyLevel, getPlayerMissions, saveNewScan, insertPlayerProgress, getPlayerMissionDetails, setPlayerMissionId, getPlayerScans, clearPlayerScans, checkPlayerProgress, updatePlayerProgress, clearPlayerData, insertPlayerMissions, updatePlayerMission } from './database.js';
+import { getPlayers, getPlayerByName, setPlayerDifficultyLevel, clearPlayerDifficultyLevels, clearPlayerDifficultyLevel, getPlayerMissions, saveNewScan, insertPlayerProgress, getPlayerMissionDetails, setPlayerMissionId, getPlayerScans, clearPlayerScans, checkPlayerProgress, updatePlayerProgress, clearPlayerData, insertPlayerMissions, updatePlayerMission, updatePlayerMissionsComplete, getPlayerMissionsComplete, updatePlayerUnlockedBasement } from './database.js';
 
 const app = express();
 app.set("view engine", "ejs");
@@ -12,6 +12,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", async (req, res) => {
+    const { id } = req.query;
+
+    if (!!id) {
+        const setPlayerDifficultyLevelResult = await setPlayerDifficultyLevel(id, null);
+    }
     const players = await getPlayers();
     res.render("index.ejs", {
         players,
@@ -46,6 +51,10 @@ app.get("/setPlayerDifficultyLevel", async (req, res) => {
     const insertPlayerMissionsResult = await insertPlayerMissions(id, difficulty);
 
     const insertPlayerProgressResult = await insertPlayerProgress(id, difficulty);
+    
+    const updatePlayerMissionsCompleteResponse = await updatePlayerMissionsComplete(id, false);
+
+    const updatePlayerUnlockedBasementResponse = await updatePlayerUnlockedBasement(id, false);
 
     const setPlayerDifficultyLevelResult = await setPlayerDifficultyLevel(id, difficulty);
     res.render("intro.ejs", {
@@ -73,8 +82,10 @@ app.get("/dashboard", async (req, res) => {
 
     const missions = await getPlayerMissions(id);
 
+    const missionsComplete = await getPlayerMissionsComplete(id);
+
     res.render("dashboard.ejs", {
-        id, difficulty, missions,
+        id, difficulty, missions, missionsComplete,
     });
 });
 
@@ -88,6 +99,21 @@ app.get("/mission", async (req, res) => {
     res.render("mission.ejs", {
         id, missionId, missionDetails, difficulty, mission, audio_url,
     });
+});
+
+app.get("/basementMission", async (req, res) => {
+    const { id, missionId } = req.query;
+
+    const setPlayerMissionIdResponse = await setPlayerMissionId(id, missionId);
+
+    res.render("basementMission.ejs", {
+        id, missionId,
+    });
+
+});
+
+app.get("/largeDoor", async (req, res) => {
+    res.render("largeDoor.ejs", {});
 });
 
 app.get("/checkNewScans", async (req, res) => {
@@ -109,11 +135,22 @@ app.get("/checkNewScans", async (req, res) => {
 
                 return res.send(checkPlayerProgressResponse);
             }
-            return res.status(200).json({ msg: 'No player progress response' });
+            if (sensor_id == 11 && missionId != 11) {
+                return res.status(200).json({ msg: "Need Spell" });   
+            } else if (sensor_id == 11 && missionId == 11) {
+                const updatePlayerUnlockedBasementResponse = await updatePlayerUnlockedBasement(id, true);
+                return res.status(200).json({ msg: "Door unlocked" });
+            }
+            return res.status(200).json({ msg: "No player progress response" });
         }
-        return res.status(200).json({ msg: 'Missing sensor_id or mission_id' });
+        return res.status(200).json({ msg: "Missing sensor_id or mission_id" });
     }
-    return res.status(200).json({ msg: 'No player scans' }); 
+    return res.status(200).json({ msg: "No player scans" });
+});
+
+app.get("/checkActivePlayers", async (req, res) => {
+    const players = await getPlayers();
+    return res.send(players);
 });
 
 app.get("/checkMissionProgress", async (req, res) => {
@@ -132,7 +169,18 @@ app.get("/checkMissionProgress", async (req, res) => {
     if (missionComplete) {
         const updatePlayerMissionResponse = await updatePlayerMission(id, missionId);
     }
-    
+
+    const playerMissions = await getPlayerMissions(id);
+    let allPlayerMissionsComplete = true;
+    for (let i = 0; i < playerMissions.length; i++) {
+        if (!playerMissions[i].is_complete) {
+            allPlayerMissionsComplete = false;
+        }
+    }
+
+    if (allPlayerMissionsComplete) {
+        const updatePlayerMissionsCompleteResponse = await updatePlayerMissionsComplete(id, true);
+    }
     return res.status(200).json({ msg: 'Mission updated' }); 
 });
 
