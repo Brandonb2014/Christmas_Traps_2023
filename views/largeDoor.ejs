@@ -76,8 +76,16 @@
                     for (let i = 0; i < data.length; i++) {
                         const player = data[i];
                         if (!!player.difficulty && !player.unlocked_basement) {
+                            const lock87Top = '100px';
+                            const lock5dTop = '550px';
+                            const lock9dTop = '550px';
+                            const lock7dTop = '50px';
+                            const lock3dTop = '300px';
+                            const lock2bTop = '400px';
+                            const locka3Top = '350px';
+                            const lock91Top = '100px';
                             const lockId = "lock" + player.id;
-                            document.getElementById(lockId).style.top = "initial";
+                            document.getElementById(lockId).style.top = lockId + 'top';
                         } else {
                             const lockId = "lock" + player.id;
                             document.getElementById(lockId).style.top = "-500px";

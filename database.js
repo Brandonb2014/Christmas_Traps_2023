@@ -7,6 +7,28 @@ const pool = mysql.createPool({
     database: 'traps_2023'
 }).promise();
 
+export async function resetGame() {
+    const resetPlayers = await pool.query(`
+        UPDATE players
+        set mission_id = 0,
+            difficulty = null,
+            missions_complete = 0,
+            unlocked_basement = 0;
+    `);
+
+    const clearPlayerMissions = await pool.query(`
+        DELETE FROM player_missions;
+    `);
+
+    const clearPlayerMissionDetails = await pool.query(`
+        DELETE FROM player_mission_details;
+    `);
+
+    const clearNewScans = await pool.query(`
+        DELETE FROM new_scans;
+    `);
+}
+
 export async function getPlayers() {
     const [rows] = await pool.query(`
         SELECT *

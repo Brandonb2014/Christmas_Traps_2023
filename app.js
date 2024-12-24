@@ -1,6 +1,6 @@
 // npm run dev to run with nodemon
 import express from 'express';
-import { getPlayers, getPlayerByName, setPlayerDifficultyLevel, clearPlayerDifficultyLevels, clearPlayerDifficultyLevel, getPlayerMissions, saveNewScan, insertPlayerProgress, getPlayerMissionDetails, setPlayerMissionId, getPlayerScans, clearPlayerScans, checkPlayerProgress, updatePlayerProgress, clearPlayerData, insertPlayerMissions, updatePlayerMission, updatePlayerMissionsComplete, getPlayerMissionsComplete, updatePlayerUnlockedBasement } from './database.js';
+import { getPlayers, getPlayerByName, setPlayerDifficultyLevel, clearPlayerDifficultyLevels, clearPlayerDifficultyLevel, getPlayerMissions, saveNewScan, insertPlayerProgress, getPlayerMissionDetails, setPlayerMissionId, getPlayerScans, clearPlayerScans, checkPlayerProgress, updatePlayerProgress, clearPlayerData, insertPlayerMissions, updatePlayerMission, updatePlayerMissionsComplete, getPlayerMissionsComplete, updatePlayerUnlockedBasement, resetGame } from './database.js';
 
 const app = express();
 app.set("view engine", "ejs");
@@ -136,7 +136,7 @@ app.get("/checkNewScans", async (req, res) => {
                 return res.send(checkPlayerProgressResponse);
             }
             if (sensor_id == 11 && missionId != 11) {
-                return res.status(200).json({ msg: "Need Spell" });   
+                return res.status(200).json({ msg: "Need Spell" });
             } else if (sensor_id == 11 && missionId == 11) {
                 const updatePlayerUnlockedBasementResponse = await updatePlayerUnlockedBasement(id, true);
                 return res.status(200).json({ msg: "Door unlocked" });
@@ -153,6 +153,11 @@ app.get("/checkActivePlayers", async (req, res) => {
     return res.send(players);
 });
 
+app.get("/resetGame", async (req, res) => {
+    const resetGameResponse = await resetGame();
+    return res.send(resetGameResponse);
+})
+
 app.get("/checkMissionProgress", async (req, res) => {
     const { id, missionId } = req.query;
 
@@ -161,7 +166,7 @@ app.get("/checkMissionProgress", async (req, res) => {
     const missionDetails = await getPlayerMissionDetails(id, missionId);
     let missionComplete = true;
     for (let i = 0; i < missionDetails.length; i++) {
-        if (!missionDetails[i].is_collected) {
+        if (missionDetails[i].display && !missionDetails[i].is_collected) {
             missionComplete = false;
         }
     }
@@ -185,8 +190,7 @@ app.get("/checkMissionProgress", async (req, res) => {
 });
 
 app.post('/api', async (req, res) => {
-    const { playerId } = req.query;
-    const { sensorId } = req.query;
+    const { playerId, sensorId } = req.query;
 
     if (!playerId || !sensorId) return res.status(400).json({ msg: 'Missing playerId or sensorId' });
 
@@ -194,28 +198,28 @@ app.post('/api', async (req, res) => {
 
     switch (playerId) {
         case '87':
-            console.log('Evelyn just hit sensor', sensorId, new Date());
+            console.log('Evelyn just hit sensor', sensorId, new Date().toLocaleString("en-US", {timeZone: "America/Denver"}));
             break;
         case '5d':
-            console.log('Shelby just hit sensor', sensorId, new Date());
+            console.log('Shelby just hit sensor', sensorId, new Date().toLocaleString("en-US", {timeZone: "America/Denver"}));
             break;
         case '9d':
-            console.log('Carson just hit sensor', sensorId, new Date());
+            console.log('Carson just hit sensor', sensorId, new Date().toLocaleString("en-US", {timeZone: "America/Denver"}));
             break;
         case '7d':
-            console.log('Emerson just hit sensor', sensorId, new Date());
+            console.log('Emerson just hit sensor', sensorId, new Date().toLocaleString("en-US", {timeZone: "America/Denver"}));
             break;
         case '3d':
-            console.log('Ollie just hit sensor', sensorId, new Date());
+            console.log('Ollie just hit sensor', sensorId, new Date().toLocaleString("en-US", {timeZone: "America/Denver"}));
             break;
         case '2b':
-            console.log('Grayson just hit sensor', sensorId, new Date());
+            console.log('Grayson just hit sensor', sensorId, new Date().toLocaleString("en-US", {timeZone: "America/Denver"}));
             break;
         case 'a3':
-            console.log('Guest - Pink Emerald just hit sensor', sensorId, new Date());
+            console.log('Guest - Pink Emerald just hit sensor', sensorId, new Date().toLocaleString("en-US", {timeZone: "America/Denver"}));
             break;
         case '91':
-            console.log('Guest - Crescent Moon just hit sensor', sensorId, new Date());
+            console.log('Guest - Crescent Moon just hit sensor', sensorId, new Date().toLocaleString("en-US", {timeZone: "America/Denver"}));
             break;
         default:
             break;
@@ -224,7 +228,16 @@ app.post('/api', async (req, res) => {
     return res.json({ playerId: `${playerId}`, sensorId: `${sensorId}`});
 });
 
-const server = app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
+app.post('/message', async (req, res) => {
+	const { chipId, message } = req.body;
+
+	if (!chipId || !message) return res.status(400).json({ msg: 'Missing chipId or message' });
+
+	console.log(new Date().toLocaleString("en-US", {timeZone: "America/Denver"}), ' - New message from chip #:', chipId, "|", message);
+	return res.status(200).json({ msg: 'Success' });
+});
+
+const server = app.listen(PORT, () => console.log(`App is now running! Navigate to localhost:${PORT} to view front end`));
 
 server.keepAliveTimeout = 120 * 1000;
 server.headersTimeout = 120 * 1000;
